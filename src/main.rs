@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use crossterm::event::{self, Event};
+use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::{
     Frame,
     style::{Style, Stylize},
@@ -21,11 +21,22 @@ fn main() {
         terminal
             .draw(|frame| draw(frame, remaining_seconds))
             .expect("failed to draw frame");
-        if matches!(event::read().expect("failed to read event"), Event::Key(_)) {
+        if handle_events().unwrap() {
             break;
         }
     }
     ratatui::restore();
+}
+
+fn handle_events() -> std::io::Result<bool> {
+    match event::read()? {
+        Event::Key(key) if key.kind == KeyEventKind::Press => match key.code {
+            KeyCode::Char('q') => return Ok(true),
+            _ => {}
+        },
+        _ => {}
+    }
+    Ok(false)
 }
 
 fn draw(frame: &mut Frame, remaining_seconds: u64) {
