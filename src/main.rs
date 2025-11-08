@@ -1,10 +1,11 @@
-use std::time::Instant;
-
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::{
     Frame,
+    layout::{Constraint, Layout},
     style::{Style, Stylize},
+    widgets::Block,
 };
+use std::time::Instant;
 use tui_big_text::{BigText, PixelSize};
 
 fn main() {
@@ -40,11 +41,24 @@ fn handle_events() -> std::io::Result<bool> {
 }
 
 fn draw(frame: &mut Frame, remaining_seconds: u64) {
+    use Constraint::{Fill, Length, Min};
+
+    let vertical = Layout::vertical([Length(1), Min(0), Length(1)]);
+    let [title_area, main_area, status_area] = vertical.areas(frame.area());
+    let horizontal = Layout::horizontal([Fill(1); 3]);
+    let [left_area, center_area, right_area] = horizontal.areas(main_area);
+
+    frame.render_widget(Block::bordered().title("Title Bar"), title_area);
+    frame.render_widget(Block::bordered().title("Status Bar"), status_area);
+    frame.render_widget(Block::bordered().title("Left"), left_area);
+    frame.render_widget(Block::bordered().title("Center"), center_area);
+    frame.render_widget(Block::bordered().title("Right"), right_area);
+
     let big_text = BigText::builder()
         .pixel_size(PixelSize::Full)
         .style(Style::new().blue())
         .centered()
         .lines(vec![remaining_seconds.to_string().red().into()])
         .build();
-    frame.render_widget(big_text, frame.area());
+    // frame.render_widget(big_text, frame.area());
 }
