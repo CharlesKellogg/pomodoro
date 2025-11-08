@@ -60,5 +60,5 @@ fn draw(frame: &mut Frame, remaining_seconds: u64) {
         .centered()
         .lines(vec![remaining_seconds.to_string().red().into()])
         .build();
-    // frame.render_widget(big_text, frame.area());
+    frame.render_widget(big_text, left_area);
 }
